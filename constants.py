@@ -17,6 +17,10 @@ AGE_PROTO = os.path.join(AGE_MODEL_DIR, "age_deploy.prototxt")
 AGE_MODEL = os.path.join(AGE_MODEL_DIR, "age_net.caffemodel")
 AGE_BUCKETS = ['(0-2)', '(4-6)', '(8-12)', '(15-20)', '(25-32)', '(38-43)', '(48-53)', '(60-100)']
 
+# --- Emotion Detection Configuration ---
+EMOTION_MODEL_DIR = os.path.join(DATA_DIR, "emotion_model")
+EMOTION_LABELS = ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
+
 # --- Recognizer Configuration ---
 RECOGNITION_CONFIDENCE = 85
 TRAINING_IMG_SIZE = (100, 100)
@@ -33,4 +37,5 @@ HAAR_MIN_SIZE_REALTIME = (40, 40)
 # Ensure directories exist
 os.makedirs(FACES_DIR, exist_ok=True)
 os.makedirs(AGE_MODEL_DIR, exist_ok=True)
+os.makedirs(EMOTION_MODEL_DIR, exist_ok=True)
 

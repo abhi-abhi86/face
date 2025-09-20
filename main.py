@@ -41,6 +41,7 @@ class Backend:
     def __init__(self):
         self.age_net = self._load_age_model()
         self.face_cascade = cv2.CascadeClassifier(C.HAAR_PATH)
+        self.emotion_net = self._load_emotion_model()
 
     def _load_age_model(self):
         try:
@@ -48,6 +49,22 @@ class Backend:
         except cv2.error:
             print("Warning: Age detection models not found.")
             return None
+
+    def _load_emotion_model(self):
+        """
+        Load emotion detection model. 
+        
+        INSTRUCTIONS FOR EMOTION MODEL:
+        For a more accurate emotion detection, you can download a pre-trained emotion model:
+        1. Download emotion detection model (e.g., FER2013 trained model)
+        2. Place the model files in opencv_data/emotion_model/ directory
+        3. Update this method to load your specific model
+        
+        Current implementation uses a simple OpenCV-based approach for basic emotion detection.
+        """
+        # For now, we'll use a simple rule-based approach
+        # In a production setup, you would load a pre-trained emotion model here
+        return None
 
     def load_labels(self):
         try:
@@ -106,6 +123,64 @@ class Backend:
             self.age_net.setInput(blob)
             return C.AGE_BUCKETS[self.age_net.forward()[0].argmax()]
         except (cv2.error, IndexError): return "?"
+
+    def detect_emotion(self, face_img):
+        """
+        Simple emotion detection based on facial features analysis.
+        
+        For more accurate results, replace this with a pre-trained emotion detection model:
+        1. Download FER2013 or similar emotion dataset trained model
+        2. Use cv2.dnn.readNetFromTensorflow() or cv2.dnn.readNetFromONNX()
+        3. Process the face image through the model
+        4. Return the predicted emotion from C.EMOTION_LABELS
+        
+        Current implementation uses basic image analysis as a demonstration.
+        """
+        if face_img is None or face_img.size == 0:
+            return "Unknown"
+        
+        try:
+            # Convert to grayscale for analysis
+            if len(face_img.shape) == 3:
+                gray_face = cv2.cvtColor(face_img, cv2.COLOR_BGR2GRAY)
+            else:
+                gray_face = face_img
+            
+            # Resize for consistent analysis
+            resized_face = cv2.resize(gray_face, (48, 48))
+            
+            # Simple emotion detection based on basic facial features
+            # This is a simplified approach - in production, use a trained model
+            
+            # Calculate basic statistics
+            mean_intensity = np.mean(resized_face)
+            std_intensity = np.std(resized_face)
+            
+            # Detect basic features for emotion estimation
+            # This is a very simplified approach for demonstration
+            
+            # Check for smile-like features (higher intensity in lower face region)
+            lower_face = resized_face[32:48, :]
+            upper_face = resized_face[0:16, :]
+            
+            lower_mean = np.mean(lower_face)
+            upper_mean = np.mean(upper_face)
+            
+            # Simple heuristic-based emotion detection
+            if lower_mean > upper_mean * 1.1 and std_intensity > 20:
+                return "Happy"
+            elif std_intensity < 15 and mean_intensity > 120:
+                return "Neutral"
+            elif mean_intensity < 100:
+                return "Sad"
+            elif std_intensity > 30:
+                return "Surprise"
+            else:
+                return "Neutral"
+                
+        except Exception as e:
+            print(f"Emotion detection error: {e}")
+            return "Unknown"
 
 # --- Manage Faces Tab ---
 class ManageTab(QWidget):
@@ -287,9 +362,20 @@ class RecognizeTab(QWidget):
             
             name = "Unknown"
             if confidence < C.RECOGNITION_CONFIDENCE: name = self.id_to_label.get(label_id, "Unknown")
-            age = self.backend.detect_age(face_roi_color); text = f"{name} | Age: {age}" if age else name
+            
+            # Detect age and emotion
+            age = self.backend.detect_age(face_roi_color)
+            emotion = self.backend.detect_emotion(face_roi_color)
+            
+            # Build display text with name, age, and emotion
+            text_parts = [name]
+            if age: text_parts.append(f"Age: {age}")
+            if emotion and emotion != "Unknown": text_parts.append(f"Emotion: {emotion}")
+            text = " | ".join(text_parts)
+            
             color = (0, 255, 0) if name != "Unknown" else (0, 0, 255)
-            cv2.rectangle(frame, (x, y), (x+w, y+h), color, 2); cv2.putText(frame, text, (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
+            cv2.rectangle(frame, (x, y), (x+w, y+h), color, 2)
+            cv2.putText(frame, text, (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
         rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         h, w, ch = rgb_image.shape; qt_image = QImage(rgb_image.data, w, h, ch * w, QImage.Format_RGB888)
         self.camera_label.setPixmap(QPixmap.fromImage(qt_image))
