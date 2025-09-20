@@ -1,0 +1,12 @@
+Core application framework
+PySide6
+
+--- CRITICAL FIX ---
+This package includes the main modules + extra modules like cv2.face
+opencv-contrib-python
+
+Numerical operations
+numpy
+
+For building some dependencies (recommended)
+cmake
