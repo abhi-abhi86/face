@@ -384,6 +384,32 @@ class RecognizeTab(QWidget):
         icon = self.style().standardIcon(QStyle.StandardPixmap.SP_MediaStop if is_active else QStyle.StandardPixmap.SP_MediaPlay)
         self.start_stop_btn.setText("Stop Recognition" if is_active else "Start Recognition"); self.start_stop_btn.setIcon(icon)
 
+# --- About Tab ---
+class AboutTab(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.init_ui()
+
+    def init_ui(self):
+        layout = QVBoxLayout(self)
+        layout.setAlignment(Qt.AlignCenter)
+        
+        title = QLabel("VisionAI - Secure Face Recognition")
+        title.setObjectName("AboutTitle")
+        title.setAlignment(Qt.AlignCenter)
+        
+        developer_label = QLabel("Developed by: Abhishek M G")
+        developer_label.setAlignment(Qt.AlignCenter)
+        
+        github_label = QLabel("GitHub: <a href='https://github.com/abhi-abhi86'>abhi-abhi86</a>")
+        github_label.setOpenExternalLinks(True)
+        github_label.setAlignment(Qt.AlignCenter)
+
+        layout.addWidget(title)
+        layout.addSpacing(20)
+        layout.addWidget(developer_label)
+        layout.addWidget(github_label)
+        
 # --- Main Window ---
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -400,9 +426,14 @@ class MainWindow(QMainWindow):
     def init_ui(self):
         central_widget = QWidget(); self.setCentralWidget(central_widget)
         main_layout = QVBoxLayout(central_widget); tabs = QTabWidget()
-        self.manage_tab = ManageTab(self.backend); self.recognize_tab = RecognizeTab(self.backend)
+        self.manage_tab = ManageTab(self.backend)
+        self.recognize_tab = RecognizeTab(self.backend)
+        self.about_tab = AboutTab()
+        
         tabs.addTab(self.manage_tab, self.style().standardIcon(QStyle.StandardPixmap.SP_DesktopIcon), "Manage Faces")
         tabs.addTab(self.recognize_tab, self.style().standardIcon(QStyle.StandardPixmap.SP_ComputerIcon), "Recognize")
+        tabs.addTab(self.about_tab, self.style().standardIcon(QStyle.StandardPixmap.SP_MessageBoxInformation), "About")
+
         train_layout = QHBoxLayout(); self.model_status_label = QLabel("Model Status:")
         train_layout.addWidget(self.model_status_label); train_layout.addStretch()
         self.train_btn = QPushButton("Train Model"); Animator.apply_morph_animation(self.train_btn)
@@ -440,4 +471,3 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv); window = MainWindow(); window.show(); sys.exit(app.exec())
-
