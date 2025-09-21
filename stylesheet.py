@@ -81,6 +81,11 @@ def get_stylesheet():
             border: 2px dashed #333c4a;
             border-radius: 6px;
         }
+        QLabel#AboutTitle {
+            font-size: 24px;
+            font-weight: bold;
+            color: #539bf5;
+        }
         QStatusBar {
             background-color: #222831;
             font-weight: bold;
@@ -99,4 +104,3 @@ def get_stylesheet():
             background-color: #f04747;
         }
     """
-
