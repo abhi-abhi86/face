@@ -17,10 +17,10 @@ from PySide6.QtWidgets import (
 )
 
 # --- Import from local modules ---
-from stylesheet import get_stylesheet
-from utils import Animator
-from security import sanitize_filename
 import constants as C
+from security import sanitize_filename
+from utils import Animator
+from stylesheet import get_stylesheet
 
 # --- Backend Worker for Threading ---
 class Worker(QObject):
